@@ -344,15 +344,16 @@ def write_components(
     components = user_yaml.get("spec", "resources")["resources"].get("GenericItems")
     open(output_file_name, "w").close()
     lq_name = local_queue or get_default_kueue_name(namespace)
-    if lq_name is None:
-        print(
-            "Kueue is not installed or won't be used. The absence of CRDs may lack the necessary functionality."
-        )
     cluster_labels = labels
     if not local_queue_exists(namespace, lq_name):
-        raise ValueError(
-            "local_queue provided does not exist or is not in this namespace. Please provide the correct local_queue name in Cluster Configuration"
-        )
+        if lq_name is None:
+            print(
+                "Kueue is not installed or won't be used. The absence of CRDs may lack the necessary functionality."
+            )
+        else:
+            raise ValueError(
+                "local_queue provided does not exist or is not in this namespace. Please provide the correct local_queue name in Cluster Configuration"
+            )
     with open(output_file_name, "a") as outfile:
         for component in components:
             if "generictemplate" in component:
@@ -383,10 +384,6 @@ def load_components(
     component_list = []
     components = user_yaml.get("spec", "resources")["resources"].get("GenericItems")
     lq_name = local_queue or get_default_kueue_name(namespace)
-    if lq_name is None:
-        print(
-            "Kueue is not installed or won't be used. The absence of CRDs may lack the necessary functionality."
-        )
     cluster_labels = labels
     if not local_queue_exists(namespace, lq_name):
         raise ValueError(
